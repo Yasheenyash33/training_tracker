@@ -3,7 +3,9 @@
 Create a Python virtualenv and install requirements:
 
 python -m venv venv
+
 source venv/bin/activate
+
 pip install -r requirements.txt
 
 
