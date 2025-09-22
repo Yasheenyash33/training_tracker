@@ -12,6 +12,7 @@ Create the MySQL database and user, update .env with credentials (or set env var
 Run migrations:
 
 python manage.py makemigrations
+
 python manage.py migrate
 
 
