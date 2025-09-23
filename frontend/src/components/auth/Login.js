@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -7,6 +8,7 @@ import {
   Typography,
   Alert,
   Container,
+  Link,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -109,6 +111,21 @@ const Login = () => {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Link component={RouterLink} to="/forgot-password" variant="body2">
+                Forgot password?
+              </Link>
+            </Box>
+
+            <Box sx={{ textAlign: 'center', mt: 1 }}>
+              <Typography variant="body2">
+                Don't have an account?{' '}
+                <Link component={RouterLink} to="/register">
+                  Sign up here
+                </Link>
+              </Typography>
+            </Box>
           </Box>
         </Paper>
       </Box>

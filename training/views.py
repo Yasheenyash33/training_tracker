@@ -1,6 +1,13 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status, generics
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, Program, ProgramTopic, Batch, BatchTrainer, BatchTrainee, Designation, DesignationProgram, TraineeDesignation, ProgressRecord, AuditLog
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+import secrets
+from datetime import timedelta
+from .models import User, Program, ProgramTopic, Batch, BatchTrainer, BatchTrainee, Designation, DesignationProgram, TraineeDesignation, ProgressRecord, AuditLog, PasswordResetToken
 from .serializers import *
 from .permissions import IsAdmin, IsTrainerOrAdmin
 
@@ -93,3 +100,103 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all().order_by('-created_at')
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAdminUser]
+
+# Authentication Views
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        # Log the registration
+        AuditLog.objects.create(
+            user=user,
+            action='USER_REGISTERED',
+            table_name='User',
+            record_id=user.id,
+            new_values={'username': user.username, 'role': user.role}
+        )
+
+        return Response({
+            "message": "User created successfully",
+            "user": UserSerializer(user).data
+        }, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def password_reset_request(request):
+    serializer = PasswordResetRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    user = User.objects.get(email=serializer.validated_data['email'])
+
+    # Generate secure token
+    token = secrets.token_urlsafe(32)
+    expires_at = timezone.now() + timedelta(hours=1)
+
+    # Create reset token
+    PasswordResetToken.objects.create(
+        user=user,
+        token=token,
+        expires_at=expires_at
+    )
+
+    # Send email (implementation depends on email backend)
+    reset_link = f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/reset-password?token={token}"
+    try:
+        send_mail(
+            'Password Reset Request',
+            f'Click the following link to reset your password: {reset_link}',
+            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@example.com'),
+            [user.email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        # Log email failure but don't expose to user
+        AuditLog.objects.create(
+            user=user,
+            action='PASSWORD_RESET_EMAIL_FAILED',
+            table_name='PasswordResetToken',
+            new_values={'error': str(e)}
+        )
+
+    # Log the request
+    AuditLog.objects.create(
+        user=user,
+        action='PASSWORD_RESET_REQUESTED',
+        table_name='PasswordResetToken',
+        new_values={'email': user.email}
+    )
+
+    return Response({"message": "Password reset email sent"})
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def password_reset_confirm(request):
+    serializer = PasswordResetSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    reset_token = serializer.validated_data['reset_token']
+    user = reset_token.user
+
+    # Update password
+    user.set_password(serializer.validated_data['new_password'])
+    user.save()
+
+    # Mark token as used
+    reset_token.is_used = True
+    reset_token.save()
+
+    # Log the reset
+    AuditLog.objects.create(
+        user=user,
+        action='PASSWORD_RESET_COMPLETED',
+        table_name='User',
+        record_id=user.id
+    )
+
+    return Response({"message": "Password reset successfully"})

@@ -39,11 +39,17 @@ api.interceptors.response.use(
 // Authentication
 export const authAPI = {
   login: (credentials) => api.post('/token/', credentials),
+  register: (userData) => api.post('/register/', userData),
   refreshToken: (refreshToken) => api.post('/token/refresh/', { refresh: refreshToken }),
+  passwordResetRequest: (email) => api.post('/password-reset/', { email }),
+  passwordResetConfirm: (token, newPassword) =>
+    api.post('/password-reset/confirm/', { token, new_password: newPassword, new_password2: newPassword }),
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-  }
+    localStorage.removeItem('user_info');
+  },
+  getCurrentUser: () => api.get('/auth/user/')
 };
 
 // Users

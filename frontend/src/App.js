@@ -6,6 +6,9 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Components
 import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/dashboard/Dashboard';
 import Programs from './components/programs/Programs';
 import Batches from './components/batches/Batches';
@@ -52,11 +55,18 @@ function AppRoutes() {
               <Route path="/progress" element={<Progress />} />
               <Route path="/users" element={<Users />} />
               <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/register" element={<Navigate to="/" replace />} />
+              <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+              <Route path="/reset-password" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
         ) : (
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         )}

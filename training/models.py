@@ -1,13 +1,39 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
 
 class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('trainer', 'Trainer'),
+        ('trainee', 'Trainee'),
+    ]
+
     phone = models.CharField(max_length=50, blank=True, null=True)
-    role = models.CharField(max_length=50, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='trainee')
     is_active_flag = models.BooleanField(default=True)
     def __str__(self):
         return self.get_full_name() or self.username
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_tokens')
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Reset token for {self.user.username}"
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['token']),
+            models.Index(fields=['expires_at']),
+        ]
 
 class Designation(models.Model):
     name = models.CharField(max_length=255)
