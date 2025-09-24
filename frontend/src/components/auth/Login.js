@@ -14,8 +14,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
+    username: 'admin@Stack',
+    password: 'St@ckly2025',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

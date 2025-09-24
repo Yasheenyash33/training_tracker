@@ -153,3 +153,17 @@ class AuditLog(models.Model):
     user_agent = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self): return f"{self.action} - {self.table_name} - {self.record_id}"
+
+class Class(models.Model):
+    name = models.CharField(max_length=255)
+    trainer_name = models.CharField(max_length=255)
+    class_timings = models.CharField(max_length=255)  # e.g., "Mon, Wed, Fri 10:00 AM - 12:00 PM"
+    google_meet_link = models.URLField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='classes_created')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.trainer_name}"

@@ -13,10 +13,12 @@ router.register(r'designation-programs', views.DesignationProgramViewSet)
 router.register(r'trainee-designations', views.TraineeDesignationViewSet)
 router.register(r'progress-records', views.ProgressRecordViewSet)
 router.register(r'audit-logs', views.AuditLogViewSet)
+router.register(r'classes', views.ClassViewSet)
 
 # Authentication URLs
 urlpatterns = router.urls + [
     path('register/', views.UserRegistrationView.as_view(), name='user_register'),
     path('password-reset/', views.password_reset_request, name='password_reset_request'),
     path('password-reset/confirm/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('auth/user/', views.get_current_user, name='current_user'),
 ]

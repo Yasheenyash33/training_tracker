@@ -1,13 +1,15 @@
 from rest_framework import viewsets, permissions, filters, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
 from datetime import timedelta
-from .models import User, Program, ProgramTopic, Batch, BatchTrainer, BatchTrainee, Designation, DesignationProgram, TraineeDesignation, ProgressRecord, AuditLog, PasswordResetToken
+from .models import User, Program, ProgramTopic, Batch, BatchTrainer, BatchTrainee, Designation, DesignationProgram, TraineeDesignation, ProgressRecord, AuditLog, PasswordResetToken, Class
 from .serializers import *
 from .permissions import IsAdmin, IsTrainerOrAdmin
 
@@ -100,6 +102,31 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all().order_by('-created_at')
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAdminUser]
+
+class ClassViewSet(viewsets.ModelViewSet, StandardListMixin):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    permission_classes = [IsTrainerOrAdmin]
+    search_fields = ('name', 'trainer_name', 'description')
+    filterset_fields = ('is_active',)
+    ordering_fields = ('name', 'created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class ClassViewSet(viewsets.ModelViewSet, StandardListMixin):
+    queryset = Class.objects.all()
+    serializer_class = ClassSerializer
+    permission_classes = [IsTrainerOrAdmin]
+    search_fields = ('name', 'trainer_name', 'description')
+    filterset_fields = ('is_active',)
+    ordering_fields = ('name', 'created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 # Authentication Views
 class UserRegistrationView(generics.CreateAPIView):
@@ -200,3 +227,13 @@ def password_reset_confirm(request):
     )
 
     return Response({"message": "Password reset successfully"})
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_current_user(request):
+    """
+    Get current authenticated user information
+    """
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+    return Response(serializer.data)

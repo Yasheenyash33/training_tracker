@@ -61,7 +61,7 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = "training.User"
+AUTH_USER_MODEL = 'training.User'
 
 AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = "en-us"

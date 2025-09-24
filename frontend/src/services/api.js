@@ -108,4 +108,13 @@ export const designationsAPI = {
   delete: (id) => api.delete(`/designations/${id}/`),
 };
 
+// Classes
+export const classesAPI = {
+  getAll: () => api.get('/classes/'),
+  getById: (id) => api.get(`/classes/${id}/`),
+  create: (classData) => api.post('/classes/', classData),
+  update: (id, classData) => api.put(`/classes/${id}/`, classData),
+  delete: (id) => api.delete(`/classes/${id}/`),
+};
+
 export default api;

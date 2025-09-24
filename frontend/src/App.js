@@ -10,6 +10,9 @@ import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import Dashboard from './components/dashboard/Dashboard';
+import SuperAdminDashboard from './components/dashboard/SuperAdminDashboard';
+import TrainerDashboard from './components/dashboard/TrainerDashboard';
+import TraineeDashboard from './components/dashboard/TraineeDashboard';
 import Programs from './components/programs/Programs';
 import Batches from './components/batches/Batches';
 import Progress from './components/progress/Progress';
@@ -41,7 +44,22 @@ const theme = createTheme({
 
 // Main App component
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+
+  const getDashboardComponent = () => {
+    if (!user) return <Login />;
+
+    switch (user.role) {
+      case 'admin':
+        return <SuperAdminDashboard />;
+      case 'trainer':
+        return <TrainerDashboard />;
+      case 'trainee':
+        return <TraineeDashboard />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
     <Router>
@@ -49,7 +67,10 @@ function AppRoutes() {
         {isAuthenticated ? (
           <Layout>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={getDashboardComponent()} />
+              <Route path="/admin-dashboard" element={<SuperAdminDashboard />} />
+              <Route path="/trainer-dashboard" element={<TrainerDashboard />} />
+              <Route path="/trainee-dashboard" element={<TraineeDashboard />} />
               <Route path="/programs" element={<Programs />} />
               <Route path="/batches" element={<Batches />} />
               <Route path="/progress" element={<Progress />} />
