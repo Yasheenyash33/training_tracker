@@ -12,6 +12,8 @@ class User(AbstractUser):
 
     phone = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='trainee')
+    expertise = models.TextField(blank=True, null=True)
+    designation = models.CharField(max_length=255, blank=True, null=True)
     is_active_flag = models.BooleanField(default=True)
     def __str__(self):
         return self.get_full_name() or self.username

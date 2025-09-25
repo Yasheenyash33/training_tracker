@@ -33,8 +33,8 @@ const Progress = () => {
         progressAPI.getAll(),
         batchTraineesAPI.getAll(),
       ]);
-      setProgressRecords(progressRes.data);
-      setBatchTrainees(traineesRes.data);
+      setProgressRecords(progressRes.data.results || []);
+      setBatchTrainees(traineesRes.data.results || []);
     } catch (error) {
       console.error('Error fetching progress data:', error);
       setError('Failed to fetch progress data');

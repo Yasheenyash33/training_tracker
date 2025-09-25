@@ -58,8 +58,8 @@ const Batches = () => {
         batchesAPI.getAll(),
         programsAPI.getAll(),
       ]);
-      setBatches(batchesRes.data);
-      setPrograms(programsRes.data);
+      setBatches(batchesRes.data.results || []);
+      setPrograms(programsRes.data.results || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to fetch data');

@@ -25,6 +25,7 @@ class UserViewSet(viewsets.ModelViewSet, StandardListMixin):
     permission_classes = [IsAdmin]
     search_fields = ('username','email','first_name','last_name')
     ordering_fields = ('id','username','email')
+    filterset_fields = ('role', 'is_active_flag')
 
 class ProgramViewSet(viewsets.ModelViewSet, StandardListMixin):
     queryset = Program.objects.all()

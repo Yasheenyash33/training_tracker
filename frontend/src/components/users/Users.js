@@ -23,6 +23,9 @@ import {
   CircularProgress,
   Alert,
   Button,
+  Tabs,
+  Tab,
+  Pagination,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -42,18 +45,37 @@ const Users = () => {
     last_name: '',
     phone: '',
     role: '',
+    expertise: '',
+    designation: '',
   });
   const [error, setError] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [pagination, setPagination] = useState({
+    count: 0,
+    next: null,
+    previous: null,
+    currentPage: 1,
+  });
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [roleFilter, pagination.currentPage]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await usersAPI.getAll();
-      setUsers(response.data);
+      const params = { page: pagination.currentPage };
+      if (roleFilter !== 'all') {
+        params.role = roleFilter;
+      }
+      const response = await usersAPI.getAll(params);
+      setUsers(response.data.results || []);
+      setPagination({
+        count: response.data.count || 0,
+        next: response.data.next,
+        previous: response.data.previous,
+        currentPage: pagination.currentPage,
+      });
     } catch (error) {
       console.error('Error fetching users:', error);
       setError('Failed to fetch users');
@@ -72,6 +94,8 @@ const Users = () => {
         last_name: user.last_name || '',
         phone: user.phone || '',
         role: user.role || '',
+        expertise: user.expertise || '',
+        designation: user.designation || '',
       });
     } else {
       setEditingUser(null);
@@ -82,6 +106,8 @@ const Users = () => {
         last_name: '',
         phone: '',
         role: '',
+        expertise: '',
+        designation: '',
       });
     }
     setOpen(true);
@@ -97,6 +123,8 @@ const Users = () => {
       last_name: '',
       phone: '',
       role: '',
+      expertise: '',
+      designation: '',
     });
     setError('');
   };
@@ -138,6 +166,15 @@ const Users = () => {
     }
   };
 
+  const handleRoleFilterChange = (event, newValue) => {
+    setRoleFilter(newValue);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handlePageChange = (event, page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -152,6 +189,15 @@ const Users = () => {
         <Typography variant="h4" component="h1">
           Users
         </Typography>
+      </Box>
+
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={roleFilter} onChange={handleRoleFilterChange} aria-label="user role filter">
+          <Tab label="All Users" value="all" />
+          <Tab label="Admins" value="admin" />
+          <Tab label="Trainers" value="trainer" />
+          <Tab label="Trainees" value="trainee" />
+        </Tabs>
       </Box>
 
       {error && (
@@ -214,6 +260,15 @@ const Users = () => {
         </Table>
       </TableContainer>
 
+      <Box display="flex" justifyContent="center" mt={3}>
+        <Pagination 
+          count={Math.ceil(pagination.count / 20)} 
+          page={pagination.currentPage} 
+          onChange={handlePageChange} 
+          color="primary"
+        />
+      </Box>
+
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>
           {editingUser ? 'Edit User' : 'Add New User'}
@@ -271,6 +326,28 @@ const Users = () => {
                 <MenuItem value="trainee">Trainee</MenuItem>
               </Select>
             </FormControl>
+            {formData.role === 'trainer' && (
+              <TextField
+                margin="normal"
+                fullWidth
+                multiline
+                rows={3}
+                label="Expertise Areas"
+                placeholder="e.g., Python, JavaScript, Data Science"
+                value={formData.expertise}
+                onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
+              />
+            )}
+            {formData.role === 'trainee' && (
+              <TextField
+                margin="normal"
+                fullWidth
+                label="Designation"
+                placeholder="e.g., Software Engineer, Data Analyst"
+                value={formData.designation}
+                onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+              />
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
