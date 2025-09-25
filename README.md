@@ -195,11 +195,8 @@ If the frontend can't connect to the backend:
 4. Push: `git push origin feature/new-feature`.
 5. Open a Pull Request.
 
+Use branch prefix `blackboxai/` for changes from this session.
 
 ## License
 
 MIT License. See LICENSE file for details.
-
-## Recent Updates
-
-- **User Management Enhancement**: Added role-specific fields (expertise for trainers, designations for trainees), filtering by role, and pagination in the Users component. Backend supports query params for filtering. Full CRUD verified.
