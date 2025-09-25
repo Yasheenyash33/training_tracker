@@ -327,26 +327,7 @@ npm test
 2. Serve the `build` folder with a web server
 3. Configure API base URL for production
 
-### Docker Deployment (Recommended)
-```dockerfile
-# Backend Dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-RUN python manage.py collectstatic --noinput
-CMD ["gunicorn", "training_tracker.wsgi:application"]
 
-# Frontend Dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-CMD ["serve", "-s", "build"]
-```
 
 ## 🤝 Contributing
 
