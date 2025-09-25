@@ -47,7 +47,7 @@ const Programs = () => {
     try {
       setLoading(true);
       const response = await programsAPI.getAll();
-      setPrograms(response.data);
+      setPrograms(response.data.results || []);
     } catch (error) {
       console.error('Error fetching programs:', error);
       setError('Failed to fetch programs');
