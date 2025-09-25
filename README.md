@@ -143,7 +143,7 @@ training_tracker/
 
 6. **Start Django development server**
    ```bash
-   python manage.py runserver
+   python manage.py runserver http://127.0.0.1:8000/
    ```
 
 ### Frontend Setup
@@ -164,7 +164,7 @@ training_tracker/
    ```
 
 4. **Access the application**
-   - Frontend: http://localhost:3001
+   - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - Admin Panel: http://localhost:8000/admin/
 
@@ -277,7 +277,7 @@ SECRET_KEY=your-secret-key-here
 DEBUG=True
 DATABASE_URL=sqlite:///db.sqlite3
 ALLOWED_HOSTS=localhost,127.0.0.1
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3000
 ```
 
 ### Django Settings
