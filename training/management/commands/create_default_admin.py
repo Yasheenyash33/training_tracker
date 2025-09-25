@@ -17,8 +17,11 @@ class Command(BaseCommand):
         try:
             # Check if user already exists
             if User.objects.filter(username=username).exists():
+                user = User.objects.get(username=username)
+                user.set_password(password)
+                user.save()
                 self.stdout.write(
-                    self.style.WARNING(f'User {username} already exists')
+                    self.style.WARNING(f'User {username} already exists. Password reset to {password}')
                 )
                 return
 
@@ -36,9 +39,9 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'Successfully created admin user: {username}\n'
-                    f'Email: {email}\n'
-                    f'Password: {password}\n'
+                    f'Successfully created admin user: {username}\\n'
+                    f'Email: {email}\\n'
+                    f'Password: {password}\\n'
                     f'Role: admin'
                 )
             )
